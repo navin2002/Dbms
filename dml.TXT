@@ -1,0 +1,195 @@
+select * from MASTER;
+INSERT INTO MASTER(
+Master_Id, Name, M_Type, Nationality)
+VALUES 
+(101, 'Adolf Hitler', 'person',      'Germany'),
+(102, 'Guru',         'cartoon',     'USA'),
+(103, 'Frankenstein', 'fictional',   'England'),
+(104, 'Ivan Dracula', 'fictional',   'Russia'),
+(105, 'Osama',        'person',      'Saudi Arabia'),
+(106, 'Nero',         'cartoon',     'Europe'),
+(107, 'Mojo Jojo',    'cartoon',     'USA'),
+(108, 'Loki',         'fictional',   'USA'),
+(109, 'Lex Luthor',   'fictional',   'USA'),
+(110, 'Megatron',     'cartoon',     'Japan')
+;
+SELECT * FROM MASTER;
+
+
+
+
+
+select * from EVILNESS;
+INSERT INTO EVILNESS(Evil_Id,  Level, Description)
+VALUES 
+(201, 1, 'Sneeze'),
+(202, 2, 'Itch'),
+(203, 3, 'Tickle'),
+(204, 4, 'Yawn');
+select * from EVILNESS;
+
+
+
+select * from MINION;
+INSERT INTO MINION(Minion_Id, Evilness, Name, Gender, Age, Nationality, Hiring_Charge)
+VALUES 
+(301, 203, 'Stuart' ,'M' ,6 ,'USA' ,100),
+(302, 204, 'Bob' ,'M' ,8 ,'Japan' ,140),
+(303, 202, 'Kevin' ,'M' ,4, 'India' ,75),
+(304, 204, 'Dave' ,'M' ,9 ,'Russia' ,120),
+(305, 202, 'Mark' ,'M' ,5 ,'Germany' ,80),
+(306, 201, 'Phil' ,'M' ,10 ,'USA' ,90),
+(307, 204, 'Liza' ,'F' ,3 ,'Japan' ,150),
+(308, 203, 'Mike' ,'M' ,6 ,'India' ,90),
+(309, 202, 'Paul' ,'M' ,9 ,'Russia',85),
+(310, 204, 'Lance' ,'F' ,6 ,'England', 70),
+(311, 202, 'Zugi' ,'F' ,9 ,'India' ,90),
+(312, 203, 'Steve', 'M' ,7 ,'USA' ,110);
+select * from MINION;
+
+
+SELECT * FROM TRAINING;
+INSERT INTO TRAINING(Training_Id, Level ,Trainer, From_Date, To_Date)
+VALUES
+(401 ,4 ,304 ,'2017-01-05' ,'2017-01-15'),
+(402 ,3 ,312 ,'2017-01-07' ,'2017-01-10'),
+(403 ,2 ,302 ,'2017-01-09' ,'2017-01-24'),
+(404 ,1 ,308 ,'2017-01-11' ,'2017-01-15');
+SELECT * FROM TRAINING;
+
+SELECT * FROM MISSION;
+INSERT INTO MISSION(Mission_Id ,Pre_Req ,Minion_Count ,Country, Estimate, Status ,From_Date, To_Date)
+VALUES
+(501, 3, 1, 'Japan', 1200, 'underway', '2017-01-14','2017-01-18'),
+(502, 4, 2, 'USA', 2500 ,'underway', '2017-01-16' ,'2017-01-22'),
+(503, 3, 1, 'England', 2200, 'underway', '2017-02-02' ,'2017-01-10'),
+(504, 2, 3, 'India', 2400, 'completed', '2016-12-18' ,'2016-12-27'),
+(505, 4, 4, 'China', 4000, 'cancelled',NULL  , NULL);
+SELECT * FROM MISSION;
+
+select * from INVOLVED_IN;
+insert into INVOLVED_IN (Minion_Id, Mission_Id, Master_Id)
+values
+(302, 501, 110),
+(301, 502, 107),
+(306, 502, 107),
+(310, 503, 103),
+(303, 504, 104),
+(308, 504, 104),
+(311, 504, 104);
+select * from INVOLVED_IN;
+
+
+select * from TAKES_TRAINING;
+insert into TAKES_TRAINING(Training_Id, Minion_Id)
+values
+(402, 303),
+(401, 301),
+(403, 306),
+(402, 311);
+select * from TAKES_TRAINING;
+
+select * from CURRENCY;
+insert into CURRENCY(Currency_Id ,Name, Country ,B_Currency)
+values
+(601, 'INR' ,'India', 4),
+(602, 'Japanese YEN','Japan', 8),
+(603, 'Euro' ,'Germany', 4.5),
+(604, 'USD' ,'USA' ,7),
+(605, 'Pound Sterling', 'England', 9.5),
+(606, 'Ruble' ,'Russia', 12),
+(607, 'Riyal', 'Saudi Arabia', 10);
+select * from CURRENCY;
+
+
+
+select * from PAYMENT;
+insert into PAYMENT(Mission_Id ,Payment_Id ,Currency_Id, Amount, Date)
+values
+(504, 7303, 601, 765, '2016-12-27'),
+(504, 7308, 601, 765, '2016-12-27'),
+(504, 7311, 601, 637.5, '2016-12-27');
+select * from PAYMENT;
+
+
+
+
+
+begin;
+select * from CURRENCY;
+insert into CURRENCY(Currency_Id ,Name, Country, B_Currency)
+values 
+(608,'Euro','Europe',15);
+
+commit;
+select * from CURRENCY;
+
+
+
+
+
+
+BEGIN;
+SELECT * FROM MINION;
+UPDATE MINION SET Nationality= 'Japan'
+    WHERE Name = 'Dave';
+SELECT * FROM MINION;
+SAVEPOINT A;
+
+
+
+
+
+SELECT * FROM TRAINING;
+UPDATE TRAINING SET To_Date= '2017-01-23'
+    WHERE Level = 4;
+SELECT * FROM TRAINING;
+SAVEPOINT B;
+
+
+
+
+
+
+SELECT * FROM MISSION;
+UPDATE MISSION
+SET Status = 'cancelled'
+WHERE Mission_Id=(select Mission_Id from INVOLVED_IN where Master_Id=(select Master_Id from MASTER where MASTER.Name='Frankenstein'));
+SELECT * FROM MISSION;
+
+
+
+CREATE TABLE COUNTRY
+(
+ Country_Code numeric(4) NOT NULL,
+ Country_Name varchar(15) NOT NULL UNIQUE,
+ 
+ 
+ CONSTRAINT Country_pkey PRIMARY KEY (Country_Code)
+
+);
+SELECT * FROM COUNTRY;
+INSERT INTO COUNTRY(Country_Code,Country_Name)
+VALUES
+(1,'India'),
+(2,'Japan');
+SELECT * FROM COUNTRY;
+SAVEPOINT C;
+
+
+
+
+DELETE FROM COUNTRY WHERE Country_Code=2;
+SELECT * FROM COUNTRY;
+
+
+rollback to savepoint c;
+select * from COUNTRY;
+
+rollback to savepoint b;
+select * from COUNTRY;
+
+
+rollback to savepoint b;
+select * from MISSION;
+

@@ -1,0 +1,131 @@
+DROP TABLE IF EXISTS MASTER;
+CREATE TABLE MASTER
+(
+ Master_Id numeric(4) NOT NULL,
+ Name varchar(15) NOT NULL UNIQUE,
+ Nationality varchar(15) NOT NULL,
+ M_Type varchar(15) NOT NULL,
+ 
+ CONSTRAINT Master_pkey PRIMARY KEY (Master_Id)
+
+);
+
+DROP TABLE IF EXISTS CURRENCY;
+CREATE TABLE CURRENCY
+(
+ Currency_Id numeric(4) NOT NULL,
+ Name varchar(15) NOT NULL ,
+ Country varchar(15) NOT NULL,
+ B_Currency decimal(15) NOT NULL,
+ 
+ CONSTRAINT Currency_pkey PRIMARY KEY (Currency_Id)
+
+);
+
+DROP TABLE IF EXISTS EVILNESS;
+CREATE TABLE EVILNESS
+(
+ Evil_Id numeric(4) NOT NULL,
+ Description varchar(20) NOT NULL,
+ Level numeric(4) NOT NULL UNIQUE,
+ 
+ CONSTRAINT Evil_pkey PRIMARY KEY (Evil_Id)
+
+);
+
+DROP TABLE IF EXISTS MINION;
+CREATE TABLE MINION
+(
+ Minion_Id numeric(4) NOT NULL,
+ Name varchar(20) NOT NULL,
+ Gender varchar(2) NOT NULL,
+ Age numeric(2)  NOT NULL,
+ Nationality varchar(20) NOT NULL,
+ Hiring_Charge decimal(6) NOT NULL,
+ Evilness numeric(4) NOT NULL,
+ CONSTRAINT minion_pkey PRIMARY KEY (Minion_Id),
+ CONSTRAINT minion_evilness_fkey FOREIGN KEY (Evilness)
+ REFERENCES public.evilness (Evil_Id)
+ ON UPDATE NO ACTION
+ ON DELETE NO ACTION
+);
+
+DROP TABLE IF EXISTS TRAINING;
+CREATE TABLE TRAINING
+(
+ Training_Id numeric(4) NOT NULL,
+ 
+ Level numeric(4) NOT NULL,
+ Trainer numeric(4) NOT NULL,
+ From_Date date  NOT NULL,
+ To_Date date NOT NULL,
+ CONSTRAINT Training_pkey PRIMARY KEY (Training_Id),
+ CONSTRAINT TRAINING_EVILNESS_fkey FOREIGN KEY (Level)
+ REFERENCES public.EVILNESS (level),
+ CONSTRAINT TRAINING_MINION_fkey FOREIGN KEY (Trainer)
+ REFERENCES public.MINION (Minion_Id)
+
+);
+DROP TABLE IF EXISTS MISSION;
+CREATE TABLE MISSION
+(
+ Mission_Id numeric(4) NOT NULL,
+Pre_Req numeric(4) NOT NULL,
+Minion_Count numeric(2) NOT NULL,
+ Country varchar(20) NOT NULL,
+Estimate decimal(8) NOT NULL,
+	Status varchar(15) NOT NULL ,
+ From_Date date ,
+To_Date date ,
+ 
+ CONSTRAINT Mission_pkey PRIMARY KEY (Mission_Id)
+
+);
+
+DROP TABLE IF EXISTS PAYMENT;
+CREATE TABLE PAYMENT
+(
+ Mission_Id numeric(4) NOT NULL,
+	Payment_Id numeric(4) NOT NULL,
+	Currency_Id numeric(4) NOT NULL,
+	Amount decimal(4) NOT NULL,
+	Date date NOT NULL,
+ 
+ CONSTRAINT Payment_pkey PRIMARY KEY (Payment_Id,Mission_Id),
+ CONSTRAINT PAYMENT_MISSION_fkey FOREIGN KEY (Mission_Id)
+ REFERENCES public.MISSION (Mission_Id),
+ CONSTRAINT PAYMENT_CURRENCY_fkey FOREIGN KEY (Currency_Id )
+ REFERENCES public.CURRENCY (Currency_Id )
+
+);
+
+DROP TABLE IF EXISTS INVOLVED_IN;
+CREATE TABLE INVOLVED_IN
+(
+ Mission_Id numeric(4) NOT NULL,
+	Minion_Id numeric(4) NOT NULL,
+	Master_Id numeric(4) NOT NULL,
+	
+ 
+ CONSTRAINT INVOLVED_IN_pkey PRIMARY KEY ( Mission_Id,Minion_Id),
+ CONSTRAINT INVOLVED_IN_MISSION_fkey FOREIGN KEY (Mission_Id)
+ REFERENCES public.MISSION (Mission_Id),
+ CONSTRAINT INVOLVED_IN_MINION_fkey FOREIGN KEY (Minion_Id  )
+ REFERENCES public.MINION (Minion_Id  ),
+CONSTRAINT INVOLVED_IN_MASTER_fkey FOREIGN KEY (Master_Id )
+ REFERENCES public.MASTER (Master_Id )
+
+);
+
+DROP TABLE IF EXISTS TAKES_TRAINING;
+CREATE TABLE TAKES_TRAINING
+(
+ Training_Id numeric(4) NOT NULL,
+	Minion_Id numeric(4) NOT NULL,
+CONSTRAINT TAKES_TRAINING_pkey PRIMARY KEY ( Training_Id,Minion_Id),
+ CONSTRAINT TAKES_TRAINING_TRAINING_fkey FOREIGN KEY (Training_Id)
+ REFERENCES public.TRAINING (TRAINING_Id),
+ CONSTRAINT TAKES_TRAINING_MINION_fkey FOREIGN KEY (Minion_Id  )
+ REFERENCES public.MINION (Minion_Id  )
+
+);
